@@ -29,10 +29,12 @@ nginx serves the repo file directly from a read-only bind mount, so an edit to
 
 2. **The preview harness rewrites app HTML.** It injects a script after *every*
    literal `<head>` string in the HTML source, not just the real document head.
-   This game's bundled JavaScript contains two literal `<head>` substrings, so
-   the injection splits the 1.8 MB bundle and the page dies with
+   This game's bundled JavaScript contains two literal `<head>` substrings (a
+   DOMPurify XHTML wrapper and a hidden iframe's `document.write`), so the
+   injection splits the bundle and the page dies with
    `SyntaxError: Invalid or unexpected token` followed by
-   `ReferenceError: Scaffolding is not defined`.
+   `ReferenceError: Scaffolding is not defined`. Reproduced at commit c906b0b
+   by serving `Index.html` directly at `/`; absent through the shell below.
 
    When `BASE44_PREVIEW_MODE=1`, `/` therefore serves `.base44/preview.html`,
    which fetches `/game.raw` (`Index.html` as `application/octet-stream`) and
