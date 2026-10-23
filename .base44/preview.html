@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--
+  Sandbox-only preview shell.
+
+  The game itself is the single packaged file Index.html at the repo root; this
+  page exists only because the Base44 preview harness injects a script after
+  every literal "<head>" it finds in an app's HTML source - including the two
+  occurrences inside the game's JavaScript bundle, which corrupts the bundle and
+  stops the game from booting. Loading the game as raw bytes and handing it to
+  the iframe as a blob keeps the game's source out of reach of that rewriting.
+
+  Nothing here is game logic: delete this file and serve Index.html directly
+  anywhere the app is deployed without that harness.
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bula clicker</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #000000;
+      overflow: hidden;
+    }
+    #game {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    #fallback {
+      color: #ffffff;
+      font-family: sans-serif;
+      padding: 24px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="game" allow="autoplay; fullscreen; gamepad" allowfullscreen title="Bula clicker"></iframe>
+  <script>
+    fetch('/game.raw', { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.text();
+      })
+      .then(function (html) {
+        const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        document.getElementById('game').src = url;
+      })
+      .catch(function (error) {
+        const message = document.createElement('div');
+        message.id = 'fallback';
+        message.textContent = 'Could not load the game: ' + error;
+        document.body.replaceChildren(message);
+      });
+  </script>
+</body>
+</html>

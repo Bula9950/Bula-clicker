@@ -1,0 +1,22 @@
+# Rendered at container start by the compose `command` (see
+# docker-compose.base44.yml): __ENTRY__ becomes preview.html in the Base44
+# sandbox and Index.html everywhere else, so the repo's real entry point stays
+# unchanged outside the preview.
+server {
+  listen 80;
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index __ENTRY__;
+
+  # The packaged game, served as raw bytes (no HTML content type) so nothing
+  # that rewrites app HTML can alter the game's source. See preview.html.
+  location = /game.raw {
+    default_type application/octet-stream;
+    alias /usr/share/nginx/html/Index.html;
+  }
+
+  location / {
+    try_files $uri $uri/ /__ENTRY__;
+  }
+}
